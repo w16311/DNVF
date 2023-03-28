@@ -74,15 +74,17 @@ def JacboianDet(J):
     #     J = J.permute(0, 2, 3, 4, 1)
     J = J
     # J = J / 2.
-    # scale_factor = torch.tensor([J.size(1), J.size(2), J.size(3)]).to(J).view(1, 1, 1, 1, 3) * 1.
-    # J = J * scale_factor
+    scale_factor = torch.tensor([J.size(1), J.size(2), J.size(3)]).to(J).view(1, 1, 1, 1, 3) * 1.
+    # import pdb;pdb.set_trace()
+    J = J * scale_factor
 
-    dx = J[:, 1:, :-1, :-1, :] - J[:, :-1, :-1, :-1, :]
-    dy = J[:, :-1, 1:, :-1, :] - J[:, :-1, :-1, :-1, :]
+    dy = J[:, 1:, :-1, :-1, :] - J[:, :-1, :-1, :-1, :]
+    dx = J[:, :-1, 1:, :-1, :] - J[:, :-1, :-1, :-1, :]
     dz = J[:, :-1, :-1, 1:, :] - J[:, :-1, :-1, :-1, :]
-    dx[:,:,:,:,0] += 1
-    dy[:,:,:,:,1] += 1
-    dz[:,:,:,:,2] += 1
+    # dx[:,:,:,:,0] += 1
+    # dy[:,:,:,:,1] += 1
+    # dz[:,:,:,:,2] += 1
+    # import pdb;pdb.set_trace()
     Jdet0 = dx[:, :, :, :, 0] * (dy[:, :, :, :, 1] * dz[:, :, :, :, 2] - dy[:, :, :, :, 2] * dz[:, :, :, :, 1])
     Jdet1 = dx[:, :, :, :, 1] * (dy[:, :, :, :, 0] * dz[:, :, :, :, 2] - dy[:, :, :, :, 2] * dz[:, :, :, :, 0])
     Jdet2 = dx[:, :, :, :, 2] * (dy[:, :, :, :, 0] * dz[:, :, :, :, 1] - dy[:, :, :, :, 1] * dz[:, :, :, :, 0])
@@ -91,20 +93,7 @@ def JacboianDet(J):
     return Jdet
 
 def neg_Jdet(J):
-    J = J
-    dx = J[:, 1:, :-1, :-1, :] - J[:, :-1, :-1, :-1, :]
-    dy = J[:, :-1, 1:, :-1, :] - J[:, :-1, :-1, :-1, :]
-    dz = J[:, :-1, :-1, 1:, :] - J[:, :-1, :-1, :-1, :]
-
-    dx[:,:,:,:,0] += 1
-    dy[:,:,:,:,1] += 1
-    dz[:,:,:,:,2] += 1
-
-    Jdet0 = dx[:, :, :, :, 0] * (dy[:, :, :, :, 1] * dz[:, :, :, :, 2] - dy[:, :, :, :, 2] * dz[:, :, :, :, 1])
-    Jdet1 = dx[:, :, :, :, 1] * (dy[:, :, :, :, 0] * dz[:, :, :, :, 2] - dy[:, :, :, :, 2] * dz[:, :, :, :, 0])
-    Jdet2 = dx[:, :, :, :, 2] * (dy[:, :, :, :, 0] * dz[:, :, :, :, 1] - dy[:, :, :, :, 1] * dz[:, :, :, :, 0])
-
-    Jdet = Jdet0 - Jdet1 + Jdet2
+    Jdet = JacboianDet(J)
     # import pdb;pdb.set_trace()
     Jdet = (Jdet<0).flatten()
     return Jdet.sum()/len(Jdet)

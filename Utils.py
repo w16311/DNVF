@@ -89,4 +89,15 @@ def dice(array1, array2, labels):
         dicem[idx] = top / bottom
     return dicem
 
-
+def dice_error(array1, array2, labels):
+    # array 1 is template
+    """
+    Computes the dice overlap between two arrays for a given set of integer labels.
+    """
+    dicem = np.zeros(len(labels))
+    for idx, label in enumerate(labels):
+        top = 2 * np.sum(np.logical_and(array1 == label, array2 == label))
+        bottom = np.sum(array1 == label) + np.sum(array2 == label)
+        bottom = np.maximum(bottom, np.finfo(float).eps)  # add epsilon
+        dicem[idx] = top / bottom
+    return dicem
