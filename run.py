@@ -3,6 +3,7 @@ import glob
 from train import *
 from Utils import *
 import nibabel as nib
+import numpy as np
 
 def main():
     path_img = "/home/user/Documents/dataset/Mindboggle101/mindboggle/image_in_MNI152_normalized"
@@ -26,6 +27,8 @@ def main():
         moving_seg = load_nii(seg_file[i])
         im_warped, seg_warped, dice = train([fixed, moving], [fixed_seg, moving_seg], label, T = 7, n_epoch=300)
         dice_all.append(dice)
+        # break
+    np.save("dice.npy",np.array(dice_all))
 
     # save result
     # tmp = nib.load('/home/user/Documents/NODEO-DIR/data/OAS1_0001_MR1/brain_aseg.nii.gz')

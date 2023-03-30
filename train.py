@@ -57,6 +57,7 @@ def train(img, seg, label, T = 7, n_epoch=300):
 
     # original dice loss
     dice_move2fix = dice(seg_m.unsqueeze(0).detach().cpu().numpy(), seg_f, label)
+    print("{:=^50s}".format("Start epoch"))
     print('Original Avg. dice on %d structures: ' % len(label), np.mean(dice_move2fix))
     loss_mse = torch.nn.MSELoss(reduction='mean')
 
