@@ -93,7 +93,7 @@ def train(img, seg, label, T = 7, n_epoch=300):
         # loss_sim = loss_mse(im_warped, im_f)
         # neg Jacobian loss
         # loss_J = 100 * neg_Jdet_loss(df.unsqueeze(0).permute(0, 2, 3, 4, 1))
-        loss_J = 10 * neg_Jdet_loss(phi.unsqueeze(0).permute(0, 2, 3, 4, 1))
+        loss_J = 100 * neg_Jdet_loss(phi.unsqueeze(0).permute(0, 2, 3, 4, 1))
         # phi dphi/dx loss
         loss_df = 0.1 * smoothloss_loss(df.unsqueeze(0))
         loss = loss_sim + loss_J + loss_df
@@ -113,4 +113,6 @@ def train(img, seg, label, T = 7, n_epoch=300):
             print('Avg. dice on %d structures: ' % len(label), np.mean(dice_move2fix))
     im_warped = im_warped.squeeze().detach().cpu().numpy()
     seg_warped = seg_warped.squeeze().detach().cpu().numpy()
-    return  im_warped, seg_warped, dice_move2fix
+    loss_all = [loss_sim.detach().cpu().numpy(), loss_J.detach().cpu().numpy(),\
+                loss_df.detach().cpu().numpy()]
+    return  im_warped, seg_warped, dice_move2fix, loss_all

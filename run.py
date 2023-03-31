@@ -11,6 +11,7 @@ def main():
     img_file = []
     seg_file = [] 
     dice_all = []
+    loss_all = []
     files = glob.glob(os.path.join(path_seg,"*.nii.gz"))
     for file in files:
         if "flipped" not in file:
@@ -22,13 +23,15 @@ def main():
     label = list(range(32))
     fixed = load_nii(img_file[0])
     fixed_seg = load_nii(seg_file[0])
-    for i in range(1, 61):
+    for i in range(1, 2):
         moving = load_nii(img_file[i])
         moving_seg = load_nii(seg_file[i])
-        im_warped, seg_warped, dice = train([fixed, moving], [fixed_seg, moving_seg], label, T = 7, n_epoch=300)
+        im_warped, seg_warped, dice, loss = train([fixed, moving], [fixed_seg, moving_seg], label, T = 7, n_epoch=300)
         dice_all.append(dice)
+        loss_all.append(loss)
         # break
-    np.save("dice.npy",np.array(dice_all))
+    np.save("dice.npy",np.array(dice_all),np.array(loss_all))
+
 
     # save result
     # tmp = nib.load('/home/user/Documents/NODEO-DIR/data/OAS1_0001_MR1/brain_aseg.nii.gz')
