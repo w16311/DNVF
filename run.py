@@ -8,6 +8,10 @@ import numpy as np
 def main():
     path_img = "/home/user/Documents/dataset/Mindboggle101/mindboggle/image_in_MNI152_normalized"
     path_seg = "/home/user/Documents/dataset/Mindboggle101/mindboggle/label_31_reID_merged"
+    out_path = "T7_Jdet100/"
+    out_path = os.path.join(os.getcwd(),out_path)
+    if not os.path.exists(out_path):  #判断是否存在文件夹如果不存在则创建为文件夹
+        os.makedirs(out_path)
     img_file = []
     seg_file = [] 
     dice_all = []
@@ -23,14 +27,22 @@ def main():
     label = list(range(32))
     fixed = load_nii(img_file[0])
     fixed_seg = load_nii(seg_file[0])
-    for i in range(1, 2):
+    num_train = 61
+    for i in range(1, num_train):
         moving = load_nii(img_file[i])
         moving_seg = load_nii(seg_file[i])
         im_warped, seg_warped, dice, loss = train([fixed, moving], [fixed_seg, moving_seg], label, T = 7, n_epoch=300)
         dice_all.append(dice)
         loss_all.append(loss)
+        # save result
+        tmp = nib.load(img_file[i])
+        seg_affine = tmp.affine
+        filename = os.path.split(img_file[i])[1]
+        filename = filename.split(".")[0]
+        nib.Nifti1Image(im_warped,seg_affine).to_filename(out_path + filename + '_im_warped.nii.gz')
+        nib.Nifti1Image(seg_warped,seg_affine).to_filename(out_path + filename + 'seg_warped.nii.gz')
         # break
-    np.save("dice.npy",np.array(dice_all),np.array(loss_all))
+    np.savez(out_path + "result",dice = np.array(dice_all),loss = np.array(loss_all))
 
 
     # save result
